@@ -20,7 +20,7 @@ export default function Home() {
     'omariosouto',
     'peas',
     'rafaballerini',
-    'marcobrunodev',
+    'emanuelalves',
     'felipefialho',
   ];
   const [followers, setFollowers] = useState([]);
@@ -46,7 +46,7 @@ export default function Home() {
               Bem vindo(a)
             </h1>
 
-            <OrkutNostalgicIconSet />
+            <OrkutNostalgicIconSet confiavel="3" legal="3" sexy="3" />
           </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
