@@ -24,6 +24,7 @@ export default function Home() {
     'felipefialho',
   ];
   const [followers, setFollowers] = useState([]);
+  const nostalgicIconValues = {confiavel: 3, legal: 3, sexy:3};
 
   useEffect(async () => {
     const result = await axios(
@@ -46,7 +47,7 @@ export default function Home() {
               Bem vindo(a)
             </h1>
 
-            <OrkutNostalgicIconSet confiavel="3" legal="3" sexy="3" />
+            <OrkutNostalgicIconSet confiavel={nostalgicIconValues.confiavel} legal={nostalgicIconValues.legal} sexy={nostalgicIconValues.sexy} />
           </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
