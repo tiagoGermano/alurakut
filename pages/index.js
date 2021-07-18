@@ -4,6 +4,7 @@ import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet 
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { CommunityService } from '../src/service/datoCmsClient';
 
 function CommunityBox(props) {
   return (
@@ -61,11 +62,31 @@ export default function Home() {
   const [followers, setFollowers] = useState([]);
   const nostalgicIconValues = {confiavel: 3, legal: 3, sexy:3};
 
+  const loadCommunities = async () => {
+    const savedCommunities = await CommunityService.getAllCommunities();
+    const lstCommunities = savedCommunities.map((community) => {
+      return {
+        index: community.id,
+        title: community.title,
+        image: community.tumbler,
+        url:   community.url
+      }
+    });
+
+    setCommunities(lstCommunities);
+  }
+
+  const createCommunity = async (community) => {
+    await CommunityService.createCommunity(community);
+    loadCommunities();
+  }
+
   useEffect(async () => {
     const result = await axios(
       `https://api.github.com/users/${githubUser}/followers`,
     );
  
+    loadCommunities();
     setFollowers(result.data);
   },[]);  
 
@@ -94,12 +115,11 @@ export default function Home() {
               const community = {
                 index: communityIndex,
                 title: formData.get('title'),
-                image: formData.get('image'),
+                tumbler: formData.get('tumbler'),
                 url:   formData.get('url'),
               }
 
-              const updatedCommunities = [...communities, community];
-              setCommunities(updatedCommunities);
+              createCommunity(community);
 
             }}>
 
@@ -114,7 +134,7 @@ export default function Home() {
               <div>
                 <input 
                   placeholder="URL para capa da comunidade"
-                  name="image"
+                  name="tumbler"
                   aria-label="URL para capa da comunidade"
                   type="text"
                 />
