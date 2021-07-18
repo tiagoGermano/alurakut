@@ -1,21 +1,55 @@
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
-import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/alurakutCommons';
+import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/alurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
-function ProfileSidebar(prop) {
+function CommunityBox(props) {
   return (
-    <Box>
-      <img src={`http://www.github.com/${prop.githubUser}.png`} style={{ borderRadius: '8px' }} />
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle">
+        {props.title} (
+        {props.communities ? props.communities.length : 0}
+        )
+      </h2>
+      <ul>
+        {props.communities?.slice(0,6).map((community) => (
+          <li key={community.index}>
+            <a href={community.url} key={community}>
+              <img src={community.image} />
+              <span>{community.title}</span>
+            </a>
+
+          </li>
+        ))}
+      </ul>
+    </ProfileRelationsBoxWrapper>    
+  )  
+}
+
+function ProfileSidebar(props) {
+  return (
+    <Box as="aside">
+      <img src={`http://www.github.com/${props.githubUser}.png`} style={{ borderRadius: '8px' }} />
+      <hr />
+
+      <p>
+        <a className="boxLink" href={`https://github.com/${props.githubUser}`} >
+          @{props.githubUser}
+        </a>
+      </p>
+      <hr />      
+
+      <AlurakutProfileSidebarMenuDefault />
     </Box>
+
   );
 }
 
 export default function Home() {
   const githubUser = 'tiagoGermano';
-  const favorits = [
+  const favorites = [
     'juunegreiros',
     'omariosouto',
     'peas',
@@ -23,20 +57,21 @@ export default function Home() {
     'emanuelalves',
     'felipefialho',
   ];
+  const [communities, setCommunities] = useState([]);
   const [followers, setFollowers] = useState([]);
   const nostalgicIconValues = {confiavel: 3, legal: 3, sexy:3};
 
   useEffect(async () => {
     const result = await axios(
-      'https://api.github.com/users/tiagoGermano/followers',
+      `https://api.github.com/users/${githubUser}/followers`,
     );
  
     setFollowers(result.data);
-  });  
+  },[]);  
 
   return (
     <>
-      <AlurakutMenu />
+      <AlurakutMenu githubUser={githubUser}/>
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
           <ProfileSidebar githubUser={githubUser} />
@@ -49,18 +84,68 @@ export default function Home() {
 
             <OrkutNostalgicIconSet confiavel={nostalgicIconValues.confiavel} legal={nostalgicIconValues.legal} sexy={nostalgicIconValues.sexy} />
           </Box>
+          <Box>
+            <h2>O que você deseja fazer ?</h2>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              const communityIndex = communities.length;
+
+              const community = {
+                index: communityIndex,
+                title: formData.get('title'),
+                image: formData.get('image'),
+                url:   formData.get('url'),
+              }
+
+              const updatedCommunities = [...communities, community];
+              setCommunities(updatedCommunities);
+
+            }}>
+
+              <div>
+                <input 
+                  placeholder="Qual vai ser o nome da sua comunidade?"
+                  name="title"
+                  aria-label="Qual vai ser o nome da sua comunidade?"
+                  type="text"
+                />
+              </div>
+              <div>
+                <input 
+                  placeholder="URL para capa da comunidade"
+                  name="image"
+                  aria-label="URL para capa da comunidade"
+                  type="text"
+                />
+              </div>
+              <div>
+                <input 
+                  placeholder="Url da página da comunidade"
+                  name="url"
+                  aria-label="Url da página da comunidade"
+                  type="text"
+                />
+              </div>
+              <button>
+                Criar comunidade
+              </button>
+            </form>
+          </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
+          <CommunityBox title="Comunidades" communities={communities} />
+
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
               Pessoas da comunidade (
-              {favorits.length}
+              {favorites.length}
               )
             </h2>
             <ul>
-              {favorits.map((itemAtual) => (
-                <li>
-                  <a href={`/users/${itemAtual}`} key={itemAtual}>
+              {favorites.map((itemAtual) => (
+                <li key={itemAtual}>
+                  <a href={`/users/${itemAtual}`} >
                     <img src={`https://github.com/${itemAtual}.png`} />
                     <span>{itemAtual}</span>
                   </a>
@@ -76,13 +161,12 @@ export default function Home() {
               )
             </h2>
             <ul>
-              {followers.slice(0,6).map((follower) => (
-                <li>
-                  <a href={`/users/${follower.login}`} key={follower.id}>
+              {followers.slice(0,6).map((follower, index) => (
+                <li key={follower.id}>
+                  <a href={`/users/${follower.login}`} >
                     <img src={`https://github.com/${follower.login}.png`} />
                     <span>{follower.login}</span>
                   </a>
-
                 </li>
               ))}
             </ul>
