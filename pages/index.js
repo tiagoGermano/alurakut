@@ -4,7 +4,7 @@ import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet 
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { CommunityService } from '../src/service/datoCmsClient';
+import { CommunityService } from '../src/service/community';
 
 function CommunityBox(props) {
   return (
@@ -77,8 +77,14 @@ export default function Home() {
   }
 
   const createCommunity = async (community) => {
-    await CommunityService.createCommunity(community);
-    loadCommunities();
+    CommunityService.createCommunity(community, function(result){
+      const created = {
+        title: result.title,
+        tumbler: result.tumbler,
+        url: result.url,
+      }
+      setCommunities([...communities, created]);
+    });
   }
 
   useEffect(async () => {
