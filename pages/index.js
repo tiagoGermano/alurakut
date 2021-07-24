@@ -3,6 +3,8 @@ import Box from '../src/components/Box';
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/alurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
 import axios from 'axios';
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 import { useEffect, useState } from 'react';
 import { CommunityService } from '../src/service/community';
 
@@ -48,8 +50,7 @@ function ProfileSidebar(props) {
   );
 }
 
-export default function Home() {
-  const githubUser = 'tiagoGermano';
+export default function Home(props) {
   const favorites = [
     'juunegreiros',
     'omariosouto',
@@ -58,6 +59,7 @@ export default function Home() {
     'emanuelalves',
     'felipefialho',
   ];
+  const [githubUser, setGithubUser] = useState(props.githubUser)
   const [communities, setCommunities] = useState([]);
   const [followers, setFollowers] = useState([]);
   const nostalgicIconValues = {confiavel: 3, legal: 3, sexy:3};
@@ -201,4 +203,15 @@ export default function Home() {
       </MainGrid>
     </>
   );
+}
+
+export async function getServerSideProps(context) {
+  const token = nookies.get(context).USER_TOKEN;
+  const decodedToken = jwt.decode(token);
+
+  return {
+    props: {
+      githubUser: decodedToken.githubUser,
+    }
+  }
 }
