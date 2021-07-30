@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 // Hook do NextJS
 import { useRouter } from 'next/router';
 import nookies from 'nookies';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [githubUser, setGithubUser] = React.useState('omariosouto');
+  const [githubUser, setGithubUser] = useState('');
+  const [submited, setSubmited] = useState(false);
 
   return (
     <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -37,10 +38,17 @@ export default function LoginScreen() {
                     })
                     router.push('/')
                 })
+                .finally(()=> {
+                  setSubmited(true);
+                })
           }}>
             <p>
               Acesse agora mesmo com seu usuário do <strong>GitHub</strong>!
           </p>
+            {githubUser.length === 0 && submited
+                ? (<p style={{color:"red"}}>Usuário não encontrado</p>)
+                : ''
+            }
             <input
                 placeholder="Usuário"
                 value={githubUser}
@@ -48,11 +56,7 @@ export default function LoginScreen() {
                     setGithubUser(evento.target.value)
                 }}
             />
-            {githubUser.length === 0
-                ? 'Preencha o campo'
-                : ''
-            }
-            <button type="submit">
+            <button type="submit" disabled={githubUser.length === 0}>
               Login
             </button>
           </form>
